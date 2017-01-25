@@ -2,12 +2,16 @@ package main
 
 import (
 	"log"
-
+	"gopkg.in/gomail.v2"
 	"github.com/influxdata/influxdb/client/v2"
 	"fmt"
 	"time"
 	"flag"
 	"os"
+	"crypto/tls"
+	"html/template"
+	"bytes"
+	"strconv"
 )
 
 var (
@@ -34,6 +38,10 @@ func init() {
 		fmt.Printf("App Version: %s\nBuild Time : %s\n", Version, BuildTime)
 		os.Exit(0)
 	}
+}
+
+type Threat struct {
+	SrcIP,DstIP, DstPort,App,ThreatType,Severity,Action,ThreatName string
 }
 
 // queryDB convenience function to query the database
@@ -77,16 +85,74 @@ func main () {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	for i, row := range res[0].Series[0].Values {
-		t, err := time.Parse(time.RFC3339, row[0].(string))
+	/*body := fmt.Sprintf("[%2s] %-15s: %-15v %-15v %-7v %-15v %-15v %-10v %-10v %-10v\n","No", "time",
+		"SrcIP","DstIP", "DstPort","App","ThreatType","Severity","Action","ThreatName")*/
+	var Threats []Threat
+	for _, row := range res[0].Series[0].Values {
+		/*t, err := time.Parse(time.RFC3339, row[0].(string))
 		if err != nil {
 			log.Fatal(err)
-		}
-		fmt.Printf("[%2d] %15s: %-15v %-15v %-7v %-15v %-15v %-10v %-10v %-10v\n", i, t.Format(time.Stamp),
-			row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
+		}*/
+		/*body += fmt.Sprintf("[%2d] %15s: %-15v %-15v %-7v %-15v %-15v %-10v %-10v %-10v\n", i, t.Format(time.Stamp),
+			row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])*/
+		Threats = append(Threats,Threat{row[1].(string), row[2].(string), row[3].(string), row[4].(string),
+			row[5].(string), row[6].(string), row[7].(string), row[8].(string)})
 	}
-	fmt.Printf("[%2s] %-15s: %-15v %-15v %-7v %-15v %-15v %-10v %-10v %-10v\n","No", "time",
-		"SrcIP","DstIP", "DstPort","App","ThreatType","Severity","Action","ThreatName")
+	buf := new(bytes.Buffer)
+	th := template.Must(template.New("html table").Parse(tmplhtml))
+	err = th.Execute(buf, Threats)
+	if err != nil {
+		log.Fatalf("can't html", err)
+	}
+	htmlbody := buf.String()
+	err = notify(strconv.Itoa(len(Threats)), htmlbody,"logstash@commonwealth.com","iromaniuk@commonwealth.com")
+	if err != nil {
+		log.Fatalf("can't notify", err)
+	}
 }
 
+func notify(count, body, from, to string) error {
+	m := gomail.NewMessage()
+	m.SetHeader("From",from)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", " THREAT count: " + count)
+	m.SetBody("text/html", body)
+	//fmt.Printf("\nSending email notification to %s:\n", to)
+	d := gomail.Dialer{Host: "relay", Port: 25}
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	if err := d.DialAndSend(m); err != nil {
+		return err
+	}
+	return nil
+}
+
+const tmplhtml = `
+	<style>
+	table, th, td {
+   	border: 1px solid black;
+	}
+	</style>
+	<table>
+	<tr style='text-align: left'>
+  	<th>SrcIP</th>
+  	<th>DstIP</th>
+  	<th>DstPort</th>
+  	<th>App</th>
+  	<th>ThreatType</th>
+  	<th>Severity</th>
+  	<th>Action</th>
+  	<th>ThreatName</th>
+	</tr>
+	{{range .}}
+	<tr>
+	<td>{{.SrcIP}}</td>
+	<td>{{.DstIP}}</td>
+	<td>{{.DstPort}}</td>
+	<td>{{.App}}</td>
+	<td>{{.ThreatType}}</td>
+	<td>{{.Severity}}</td>
+	<td>{{.Action}}</td>
+	<td>{{.ThreatName}}</td>
+	{{end}}
+	</table>
+	`
