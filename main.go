@@ -14,7 +14,7 @@ var (
 	URL = flag.String("url", "http://10.73.21.205:8086", "InfluxDB url")
 	DB = flag.String("db", "syslog", "Database name")
 	USER = flag.String("user", "firewall", "Username")
-	TIME = flag.Duration("time", 60, "time")
+	TIME = flag.Duration("time", 1, "time back in minutes ")
 	PASSWORD= flag.String("password", "password", "Password")
 	version = flag.Bool("v", false, "Prints current version")
 )
@@ -64,11 +64,11 @@ func main () {
 	log.Fatal(err)
 	}
 
-	//Find the last 3 records
+	//Find last records
 	layout := "2006-01-02 15:04:05"
 	t := time.Now()
 	t1 := t.Format(layout)
-	t2 := t.Add(-*TIME*time.Second).Format(layout)
+	t2 := t.Add(-*TIME*time.Minute).Format(layout)
 	// test with ./syslog-generator -ip="10.34.1.100" -port="11514" -protocol="udp"
 	q := fmt.Sprintf("SELECT SrcIP,DstIP,DstPort,App,ThreatType,Severity,Action,ThreatName" +
 		" FROM logstash WHERE time > '" + t2 + "' AND time < '" + t1 + "'")
