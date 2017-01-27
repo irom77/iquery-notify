@@ -20,6 +20,8 @@ var (
 	USER = flag.String("user", "firewall", "Username")
 	TIME = flag.Int("time", 1, "time back in minutes ")
 	PASSWORD= flag.String("password", "password", "Password")
+	FROM = flag.String("from", "logstash@", "Email from")
+	TO = flag.String("to", "me@", "Email to")
 	version = flag.Bool("v", false, "Prints current version")
 )
 var (
@@ -105,17 +107,17 @@ func main () {
 		log.Fatalf("can't html", err)
 	}
 	htmlbody := buf.String()
-	err = notify(strconv.Itoa(len(Threats)), htmlbody,"logstash@commonwealth.com","iromaniuk@commonwealth.com")
+	err = notify(strconv.Itoa(len(Threats)), htmlbody, *FROM, *TO, *TIME)
 	if err != nil {
 		log.Fatalf("can't notify", err)
 	}
 }
-
-func notify(count, body, from, to string) error {
+//Notify by email
+func notify(count, body, from, to string, time int) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From",from)
 	m.SetHeader("To", to)
-	m.SetHeader("Subject", " THREAT count: " + count)
+	m.SetHeader("Subject", " THREAT count: " + count + " in " + strconv.Itoa(time) + " min")
 	m.SetBody("text/html", body)
 	//fmt.Printf("\nSending email notification to %s:\n", to)
 	d := gomail.Dialer{Host: "relay", Port: 25}
