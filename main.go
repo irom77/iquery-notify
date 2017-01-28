@@ -71,7 +71,7 @@ func main () {
 	Password: *PASSWORD,
 	})
 	if err != nil {
-	log.Fatal(err)
+	log.Fatal("can't create db conn",err)
 	}
 
 	//Find last records
@@ -85,7 +85,7 @@ func main () {
 	//fmt.Println("t:",t,"\nt1:",t1,"\nt2:",t2,"\n",q)
 	res, err := queryDB(c, q)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("can't connect to db",err)
 	}
 	/*body := fmt.Sprintf("[%2s] %-15s: %-15v %-15v %-7v %-15v %-15v %-10v %-10v %-10v\n","No", "time",
 		"SrcIP","DstIP", "DstPort","App","ThreatType","Severity","Action","ThreatName")*/
