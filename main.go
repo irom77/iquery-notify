@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	URL = flag.String("url", "http://influx:8086", "InfluxDB url")
+	URL = flag.String("url", "http://10.73.21.205:8086", "InfluxDB url")
 	DB = flag.String("db", "syslog", "Database name")
 	USER = flag.String("user", "firewall", "Username")
 	TIME = flag.Int("time", 1, "time back in minutes ")
