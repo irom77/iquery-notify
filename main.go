@@ -117,7 +117,7 @@ func notify(count, body, from, to string, time int) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From",from)
 	m.SetHeader("To", to)
-	m.SetHeader("Subject", " THREAT count: " + count + " in " + strconv.Itoa(time) + " min")
+	m.SetHeader("Subject", " THREAT count: " + count + " in last " + strconv.Itoa(time) + " min")
 	m.SetBody("text/html", body)
 	//fmt.Printf("\nSending email notification to %s:\n", to)
 	d := gomail.Dialer{Host: "relay", Port: 25}
