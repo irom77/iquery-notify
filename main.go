@@ -73,7 +73,6 @@ func main () {
 	if err != nil {
 	log.Fatal("can't create db conn",err)
 	}
-	fmt.Println(c)
 	//Find last records
 	layout := "2006-01-02 15:04:05"
 	t := time.Now()
