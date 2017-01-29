@@ -135,6 +135,7 @@ const tmplhtml = `
 	</style>
 	<table>
 	<tr style='text-align: left'>
+	<th>time</th>
   	<th>SrcIP</th>
   	<th>DstIP</th>
   	<th>DstPort</th>
@@ -146,6 +147,7 @@ const tmplhtml = `
 	</tr>
 	{{range .}}
 	<tr>
+	<td>{{.time}}</td>
 	<td>{{.SrcIP}}</td>
 	<td>{{.DstIP}}</td>
 	<td>{{.DstPort}}</td>
