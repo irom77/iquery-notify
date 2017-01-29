@@ -43,7 +43,7 @@ func init() {
 }
 
 type Threat struct {
-	time, SrcIP,DstIP, DstPort,App,ThreatType,Severity,Action,ThreatName string
+	SrcIP,DstIP, DstPort,App,ThreatType,Severity,Action,ThreatName string
 }
 
 // queryDB convenience function to query the database
@@ -64,6 +64,7 @@ func queryDB(clnt client.Client, cmd string) (res []client.Result, err error) {
 }
 
 func main () {
+	//fmt.Println(*URL, *USER, *PASSWORD, *FROM, *TO)
 	// Create a new HTTPClient
 	c, err := client.NewHTTPClient(client.HTTPConfig{
 	Addr:     *URL,
@@ -92,11 +93,11 @@ func main () {
 	for _, row := range res[0].Series[0].Values {
 		/*t, err := time.Parse(time.RFC3339, row[0].(string))
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("can't oarse time", err)
 		}*/
 		/*body += fmt.Sprintf("[%2d] %15s: %-15v %-15v %-7v %-15v %-15v %-10v %-10v %-10v\n", i, t.Format(time.Stamp),
 			row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])*/
-		Threats = append(Threats,Threat{row[0].(string),row[1].(string), row[2].(string), row[3].(string), row[4].(string),
+		Threats = append(Threats,Threat{row[1].(string), row[2].(string), row[3].(string), row[4].(string),
 			row[5].(string), row[6].(string), row[7].(string), row[8].(string)})
 	}
 	buf := new(bytes.Buffer)
@@ -135,7 +136,6 @@ const tmplhtml = `
 	</style>
 	<table>
 	<tr style='text-align: left'>
-	<th>time</th>
   	<th>SrcIP</th>
   	<th>DstIP</th>
   	<th>DstPort</th>
@@ -147,7 +147,6 @@ const tmplhtml = `
 	</tr>
 	{{range .}}
 	<tr>
-	<td>{{.time}}</td>
 	<td>{{.SrcIP}}</td>
 	<td>{{.DstIP}}</td>
 	<td>{{.DstPort}}</td>
