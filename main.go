@@ -43,7 +43,7 @@ func init() {
 }
 
 type Threat struct {
-	SrcIP,DstIP, DstPort,App,ThreatType,Severity,Action,ThreatName string
+	time, SrcIP,DstIP, DstPort,App,ThreatType,Severity,Action,ThreatName string
 }
 
 // queryDB convenience function to query the database
@@ -96,7 +96,7 @@ func main () {
 		}*/
 		/*body += fmt.Sprintf("[%2d] %15s: %-15v %-15v %-7v %-15v %-15v %-10v %-10v %-10v\n", i, t.Format(time.Stamp),
 			row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])*/
-		Threats = append(Threats,Threat{row[1].(string), row[2].(string), row[3].(string), row[4].(string),
+		Threats = append(Threats,Threat{row[0].(string),row[1].(string), row[2].(string), row[3].(string), row[4].(string),
 			row[5].(string), row[6].(string), row[7].(string), row[8].(string)})
 	}
 	buf := new(bytes.Buffer)
