@@ -76,13 +76,13 @@ func main () {
 	}
 	//Find last records
 	layout := "2006-01-02 15:04:05"
-	t := time.Now()
+	t := time.Now().UTC()
 	t1 := t.Format(layout)
 	t2 := t.Add(-time.Duration(*TIME)*time.Minute).Format(layout)
 	// test with ./syslog-generator -ip="10.34.1.100" -port="11514" -protocol="udp"
 	q := fmt.Sprintf("SELECT SrcIP,DstIP,DstPort,App,ThreatType,Severity,Action,ThreatName" +
 		" FROM logstash WHERE time > '" + t2 + "' AND time < '" + t1 + "'")
-	//fmt.Println("t:",t,"\nt1:",t1,"\nt2:",t2,"\n",q)
+	fmt.Println("t:",t,"\nt1:",t1,"\nt2:",t2,"\n",q)
 	res, err := queryDB(c, q)
 	if err != nil {
 		log.Fatal("can't connect to db",err)
