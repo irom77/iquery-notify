@@ -82,26 +82,19 @@ func main () {
 	// test with ./syslog-generator -ip="10.34.1.100" -port="11514" -protocol="udp"
 	q := fmt.Sprintf("SELECT SrcIP,DstIP,DstPort,App,ThreatType,Severity,Action,ThreatName" +
 		" FROM logstash WHERE time > '" + t2 + "' AND time < '" + t1 + "'")
-	fmt.Println("t:",t,"\nt1:",t1,"\nt2:",t2,"\n",q)
+	//fmt.Println("t:",t,"\nt1:",t1,"\nt2:",t2,"\n",q)
 	res, err := queryDB(c, q)
 	if err != nil {
 		log.Fatal("can't connect to db",err)
 	}
-	/*body := fmt.Sprintf("[%2s] %-15s: %-15v %-15v %-7v %-15v %-15v %-10v %-10v %-10v\n","No", "time",
-		"SrcIP","DstIP", "DstPort","App","ThreatType","Severity","Action","ThreatName")*/
 	var Threats []Threat
 	for _, row := range res[0].Series[0].Values {
-		/*t, err := time.Parse(time.RFC3339, row[0].(string))
-		if err != nil {
-			log.Fatal("can't oarse time", err)
-		}*/
-		/*body += fmt.Sprintf("[%2d] %15s: %-15v %-15v %-7v %-15v %-15v %-10v %-10v %-10v\n", i, t.Format(time.Stamp),
-			row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])*/
 		Threats = append(Threats,Threat{row[1].(string), row[2].(string), row[3].(string), row[4].(string),
 			row[5].(string), row[6].(string), row[7].(string), row[8].(string)})
 	}
 	buf := new(bytes.Buffer)
 	th := template.Must(template.New("html table").Parse(tmplhtml))
+	fmt.Printf("%T",Threats)
 	err = th.Execute(buf, Threats)
 	if err != nil {
 		log.Fatalf("can't html", err)
