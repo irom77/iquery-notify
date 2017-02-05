@@ -43,7 +43,7 @@ func init() {
 }
 
 type Threat struct {
-	SrcIP,DstIP, DstPort,App,ThreatType,Severity,Action,ThreatName string
+	SrcIP,SrcZone,DstIP,DstZone,DstPort,App,ThreatType,Severity,Action,ThreatName string
 }
 
 // queryDB convenience function to query the database
@@ -80,7 +80,7 @@ func main () {
 	t1 := t.Format(layout)
 	t2 := t.Add(-time.Duration(*TIME)*time.Minute).Format(layout)
 	// test with ./syslog-generator -ip="10.34.1.100" -port="11514" -protocol="udp"
-	q := fmt.Sprintf("SELECT SrcIP,DstIP,DstPort,App,ThreatType,Severity,Action,ThreatName" +
+	q := fmt.Sprintf("SELECT SrcIP,SrcZone,DstIP,DstZone,DstPort,App,ThreatType,Severity,Action,ThreatName" +
 		" FROM logstash WHERE time > '" + t2 + "' AND time < '" + t1 + "'")
 	fmt.Println(q)
 	res, err := queryDB(c, q)
@@ -89,8 +89,8 @@ func main () {
 	}
 	var Threats []Threat
 	for _, row := range res[0].Series[0].Values {
-		Threats = append(Threats,Threat{row[1].(string), row[2].(string), row[3].(string), row[4].(string),
-			row[5].(string), row[6].(string), row[7].(string), row[8].(string)})
+		Threats = append(Threats,Threat{row[1].(string), row[10].(string), row[2].(string),row[11].(string), row[3].(string),row[4].(string),
+						row[5].(string), row[6].(string), row[7].(string), row[8].(string)})
 	}
 	buf := new(bytes.Buffer)
 	th := template.Must(template.New("html table").Parse(tmplhtml))
@@ -129,7 +129,9 @@ const tmplhtml = `
 	<table>
 	<tr style='text-align: left'>
   	<th>SrcIP</th>
+  	<th>SrcZone</th>
   	<th>DstIP</th>
+  	<th>DstZone</th>
   	<th>DstPort</th>
   	<th>App</th>
   	<th>ThreatType</th>
@@ -140,7 +142,9 @@ const tmplhtml = `
 	{{range .}}
 	<tr>
 	<td>{{.SrcIP}}</td>
+	<td>{{.SrcZone}}</td>
 	<td>{{.DstIP}}</td>
+	<td>{{.DstZone}}</td>
 	<td>{{.DstPort}}</td>
 	<td>{{.App}}</td>
 	<td>{{.ThreatType}}</td>
