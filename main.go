@@ -130,13 +130,13 @@ const tmplhtml = `
 	<table>
 	<tr style='text-align: left'>
   	<th>SrcIP</th>
-  	<th>SrcZone</th>
+  	<th>SrcZ</th>
   	<th>DstIP</th>
-  	<th>DstZone</th>
-  	<th>DstPort</th>
+  	<th>DstZ</th>
+  	<th>DstP</th>
   	<th>App</th>
   	<th>ThreatType</th>
-  	<th>Severity</th>
+  	<th>Sev</th>
   	<th>Action</th>
   	<th>ThreatName</th>
 	</tr>
