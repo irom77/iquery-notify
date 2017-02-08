@@ -89,7 +89,7 @@ func main () {
 	}
 	var Threats []Threat
 	for _, row := range res[0].Series[0].Values {
-		fmt.Println(row)
+		//fmt.Println(row)
 		Threats = append(Threats,Threat{row[1].(string), row[2].(string), row[3].(string),row[4].(string), row[5].(string),row[6].(string),
 						row[7].(string), row[8].(string), row[9].(string), row[10].(string)})
 	}
